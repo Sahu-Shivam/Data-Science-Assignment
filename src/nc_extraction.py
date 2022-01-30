@@ -27,26 +27,42 @@ class Extracting_Noun_Chunks:
     
     def preprocess_article(self,article):
 
-            #-------Filtering using regex-------#
-            # Steps followed:
-            # 1. Passing in text in smallcase.
-            # 2. Removing numbers.
-            # 3. Removing any extra tabs.
-            article = re.sub('\s\s+', ' ',(re.sub('[^ a-z]', ' ', article.lower())))
+        """Pre-Processes all the articles
+        
+        Keyword arguments:
+        Arguments: articles
+        Return: Returns the processed articles
+        """
+        
+        
+        #-------Filtering using regex-------#
+        # Steps followed:
+        # 1. Passing in text in smallcase.
+        # 2. Removing numbers.
+        # 3. Removing any extra tabs.
+        article = re.sub('\s\s+', ' ',(re.sub('[^ a-z]', ' ', article.lower())))
 
 
-            #-------Extracting the words that actually have meaning - basically removing stopwords-------#
-            # Steps:
-            # 1. Pulling out distinct stopwords.
-            # 2. Creating a list of words that are not stopwords.
-            # 3. Converting the list to a string
-            article = article.split(' ')
-            article = " ".join([word for word in article if word not in set(stopwords.words('english'))])
+        #-------Extracting the words that actually have meaning - basically removing stopwords-------#
+        # Steps:
+        # 1. Pulling out distinct stopwords.
+        # 2. Creating a list of words that are not stopwords.
+        # 3. Converting the list to a string
+        article = article.split(' ')
+        article = " ".join([word for word in article if word not in set(stopwords.words('english'))])
 
-            return article
+        return article
     
     
     def extract_noun_chunks(self, article):
+        
+        """Extracts Noun Chunks
+        
+        Keyword arguments:
+        Argument: Articles after preprocessing
+        Return: Returns Noun Chunks based on Bigrams/Trigrams
+        """
+        
         
         #-------Creating a Spacy Document-------#
         nlp = spacy.load("en_core_web_sm")
@@ -59,7 +75,14 @@ class Extracting_Noun_Chunks:
     
     
     def word_makes_sense(self, noun_chunks):
+
+        """Filters out words that makes sense
         
+        Keyword arguments:
+        Argument: Distinct Noun Chunks
+        Return: Returns Noun Chunks that make sense
+        """
+                
         n_chunk = []
         
         for word in noun_chunks:
@@ -79,6 +102,14 @@ class Extracting_Noun_Chunks:
     
     def postprocess_noun_chunks(self, noun_chunks):
         
+        """Post Processes Noun Chunks
+        
+        Keyword arguments:
+        Argument: Noun Chunks based on Bigrams/Trigrams
+        Return: Returns Noun Chunks
+        """
+        
+                
         #-------Deduplicating Noun-Chunks and removing words that doesn't make sense-------#
         noun_chunks = self.word_makes_sense(list(set(noun_chunks)))
         
@@ -87,24 +118,39 @@ class Extracting_Noun_Chunks:
     
     def tfidf_vectorizer(self, all_articles):
        
-        #-------Calulating Term Frequency, Inverse Document Frequency (Tfidf) to get top noun-chunks-------#
-        # Steps followed:
-        # 1. Instantiating TfidfVectorizer().
-        # 2. Fitting and transforming all the articles on the vectorizer.
-        # 3. Calculating the scores.
-        # 4. Getting feature words (sorted by index) selected from the raw documents
-        vectorizer = TfidfVectorizer(ngram_range=(2,3))
+       """Calculates Tfidf scores to get top noun chunks
+       
+       Keyword arguments:
+       Argument: All articles
+       Return: Returns tfidf scores and total words
+       """
+       
+       #-------Calulating Term Frequency, Inverse Document Frequency (Tfidf) to get top noun-chunks-------#
+       # Steps followed:
+       # 1. Instantiating TfidfVectorizer().
+       # 2. Fitting and transforming all the articles on the vectorizer.
+       # 3. Calculating the scores.
+       # 4. Getting feature words (sorted by index) selected from the raw documents
+       vectorizer = TfidfVectorizer(ngram_range=(2,3))
         
-        scores = vectorizer.fit_transform(all_articles)  # has a shape of (20, 19152)
+       scores = vectorizer.fit_transform(all_articles)  # has a shape of (20, 19152)
         
-        scores = scores.toarray().sum(axis=0)            # scores = summation of all the rows(20).
+       scores = scores.toarray().sum(axis=0)            # scores = summation of all the rows(20).
 
-        total_words = vectorizer.get_feature_names()        
+       total_words = vectorizer.get_feature_names()        
         
-        return scores, total_words
+       return scores, total_words
     
     
     def __call__(self, list_of_articles):
+        
+        """Call function - Pipeline
+        
+        Keyword arguments:
+        Argument: All articles
+        Return: Returns top 10 Noun Chunks
+        """
+        
         
         print('Please wait while the model finds the top 10 Noun-Chunks...\n')
         noun_chunks = []
