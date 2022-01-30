@@ -117,3 +117,17 @@ approach incorporates NER in a smart way, you get bonus points.
       ○ Adhere to the outlined repository structure as closely as possible.
 
 All the best and do reach out in case you have any questions. Cheers!
+
+
+## Solution:
+How to run:
+1. Change the directory in .py files according to your directory and make sure the directory contains atleast 20 json files
+2. Since my output is on frontend, I have included main.py and base.html files as well.
+3. Open VS code, create a folder <any_name_of_your_choice>, inside that folder put main.py and server.py.
+4. In that folder create another folder named "templates", inside templates put base.html.
+5. Open command prompt, go to the directory where you have created the folder <any_name_of_your_choice>.
+6. Type python main.py.
+7. Open web browser, type in http://127.0.0.1:5000.
+8. Click on the button and you'll get your top 10 Noun Chunks within sometime.
+
+Kindly let me know in case you have any queries.
